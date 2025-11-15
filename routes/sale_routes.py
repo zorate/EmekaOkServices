@@ -79,7 +79,7 @@ def log_sale(id):
 @login_required
 def recent_sales():
     sales = list(db.sales.find().sort("date", -1).limit(100))  # or filter by user
-    return render_template("sales/recent_sales.html", sales=sales)
+    return render_template("admin/recent_sales.html", sales=sales)
 
 
 @sale_bp.route("/quick-sale", methods=["GET", "POST"])

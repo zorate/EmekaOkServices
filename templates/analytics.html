@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% block title %}Analytics | Emeka Ok Service{% endblock %}
+
+{% block content %}
+<div class="analytics-wrapper">
+  <h1 class="page-title">📊 Business Analytics</h1>
+
+  <!-- Summary Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Total Revenue</h3>
+      <p>₦{{ "{:,.0f}".format(total_revenue) }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Items Sold</h3>
+      <p>{{ total_quantity }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Top Performing Batch</h3>
+      <p>{{ best.name if best else "N/A" }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Total Profit</h3>
+      <p>₦{{ "{:,.0f}".format(total_profit) }}</p>
+    </div>
+  </div>
+
+  <!-- Export Button -->
+  <div class="export-btn-wrapper">
+    <button class="export-btn" onclick="window.location.href='/analytics/export'">
+      📥 Export Report
+    </button>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Revenue by Batch</h3>
+      <canvas id="revenueChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Quantity Sold</h3>
+      <canvas id="quantityChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>7-Day Sales Trend</h3>
+      <canvas id="trendChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Profit Breakdown</h3>
+      <canvas id="profitChart"></canvas>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+body {
+  background: #0b0b0c;
+  color: #f4f4f4;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Mobile-first wrapper */
+.analytics-wrapper {
+  width: 100%;
+  padding: 12px;
+  margin: auto;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+/* Summary Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: linear-gradient(145deg, #121214, #1a1a1f);
+  padding: 14px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+}
+.stat-card h3 {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+.stat-card p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Export button */
+.export-btn-wrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.export-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.export-btn:hover {
+  background: #0056b3;
+}
+
+/* Charts */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+.chart-card {
+  background: #121214;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+.chart-card h3 {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-bottom: 8px;
+}
+canvas {
+  width: 100% !important;
+  height: 220px !important;
+}
+
+/* Larger screens */
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+  .charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Data passed from Flask
+const productNames = {{ products | map(attribute='name') | list | tojson }};
+const revenueData = {{ products | map(attribute='total_amount_sold') | list | tojson }};
+const quantityData = {{ products | map(attribute='total_quantity_sold') | list | tojson }};
+const trendLabels = {{ trend | map(attribute='_id') | list | tojson }};
+const trendData = {{ trend | map(attribute='total') | list | tojson }};
+const totalRevenue = {{ total_revenue }};
+const totalCost = {{ total_cost }};
+const totalProfit = {{ total_profit }};
+
+// Revenue Chart
+new Chart(document.getElementById("revenueChart"), {
+  type: "bar",
+  data: { labels: productNames, datasets: [{ label: "Revenue (₦)", data: revenueData, backgroundColor: "#007bff" }] },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+
+// Quantity Chart
+new Chart(document.getElementById("quantityChart"), {
+  type: "bar",
+  data: { labels: productNames, datasets: [{ label: "Quantity Sold", data: quantityData, backgroundColor: "#28a745" }] },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+
+// 7-Day Trend Chart
+new Chart(document.getElementById("trendChart"), {
+  type: "line",
+  data: { labels: trendLabels, datasets: [{ label: "Sales (₦)", data: trendData, borderColor: "#ff9f0a", fill: true }] },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+
+// Profit Donut
+new Chart(document.getElementById("profitChart"), {
+  type: "doughnut",
+  data: { labels: ["Profit", "Cost"], datasets: [{ data: [totalProfit, totalCost], backgroundColor: ["#00d084", "#ff4757"] }] },
+  options: { plugins: { legend: { labels: { color: "#fff" } } }, cutout: "65%" }
+});
+</script>
+{% endblock %}

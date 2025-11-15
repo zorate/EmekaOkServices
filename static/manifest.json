@@ -1,0 +1,21 @@
+{
+  "name": "Emeka Ok Service",
+  "short_name": "EmekaService",
+  "start_url": "/products/dashboard",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#00C896",
+  "description": "Digital salesbook for Emeka Bernard’s shop.",
+  "icons": [
+    {
+      "src": "/static/icons/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icons/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

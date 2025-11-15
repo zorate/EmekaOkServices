@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Quick Sale | Emeka Ok Service{% endblock %}
+{% block content %}
+<div class="container">
+  <h1 class="page-title">Quick Sale</h1>
+  <form method="POST">
+    <label for="product">Select Batch</label>
+    <select name="product_id" required>
+      {% for p in products %}
+        <option value="{{ p._id }}">{{ p.name }}</option>
+      {% endfor %}
+    </select>
+
+    <input type="number" name="quantity" placeholder="Quantity Sold" min="1" required />
+    <input type="number" name="amount" placeholder="Amount Received (₦)" step="0.01" required />
+    <button type="submit">Log Sale</button>
+  </form>
+</div>
+{% endblock %}

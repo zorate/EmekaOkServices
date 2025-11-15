@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Audit Log | Emeka Ok Service{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+  <h1 class="page-title">🕵️ Audit Log</h1>
+  <table class="products-table">
+    <thead>
+      <tr><th>User</th><th>Batch</th><th>Qty</th><th>Amount</th><th>Date</th></tr>
+    </thead>
+    <tbody>
+      {% for s in sales %}
+      <tr>
+        <td>{{ s.username }}</td>
+        <td>{{ s.product_name }}</td>
+        <td>{{ s.quantity }}</td>
+        <td>₦{{ "{:,.0f}".format(s.amount) }}</td>
+        <td>{{ s.date.strftime('%d %b %Y %I:%M%p') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

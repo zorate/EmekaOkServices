@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="/static/manifest.json" />
+  <script src="/static/js/pwa.js" defer></script>
+  <meta name="theme-color" content="#00C896" />
+  <link rel="icon" href="/static/icons/logo.png" type="image/png" />
+  <script src="https://kit.fontawesome.com/yourkitid.js" crossorigin="anonymous"></script> <!-- Replace with your FontAwesome kit -->
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding-bottom: 80px; /* space for bottom nav */
+    }
+
+    .container {
+      padding: 1.2rem;
+    }
+
+    .flash {
+      background: #333;
+      padding: 0.5rem 1rem;
+      margin: 0.5rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .btn {
+      background: #00c896;
+      color: #fff;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background: #00b183;
+    }
+
+    .btn.small {
+      padding: 0.4rem 0.7rem;
+      font-size: 0.85rem;
+    }
+
+    .btn.danger {
+      background: #e74c3c;
+    }
+
+    form input,
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    form input {
+      background: #2b2b2b;
+      color: #fff;
+    }
+
+    form button {
+      background: #00c896;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background: #00b183;
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0.6rem 0;
+      z-index: 100;
+    }
+
+    .bottom-nav a {
+      color: #ccc;
+      font-size: 0.9rem;
+      text-align: center;
+      flex: 1;
+    }
+
+    .bottom-nav a.active {
+      color: #00c896;
+      font-weight: bold;
+    }
+
+    .bottom-nav a i {
+      display: block;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: #00c896;
+      color: #fff;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      z-index: 101;
+    }
+
+    .fab:hover {
+      background: #00b183;
+    }
+  </style>
+</head>
+<body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat,msg in messages %}
+        <div class="flash">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  {% if current_user.is_authenticated %}
+    <!-- Floating Action Button -->
+    <a href="{{ url_for('sale.quick_sale') }}" class="fab" title="Quick Sale">
+      <i class="fas fa-plus"></i>
+    </a>
+  {% endif %}
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('product.dashboard') }}" class="{% if request.endpoint == 'product.dashboard' %}active{% endif %}">
+        <i class="fas fa-home"></i>Home
+      </a>
+      <!--<a href="{{ url_for('sale.recent_sales') }}" class="{% if request.endpoint == 'sale.recent_sales' %}active{% endif %}">
+        <i class="fas fa-clock"></i>History
+      </a>-->
+      {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+          <i class="fas fa-user-shield"></i>Admin
+        </a>
+      {% endif %}
+      <a href="{{ url_for('auth.logout') }}">
+        <i class="fas fa-sign-out-alt"></i>Logout
+      </a>
+    {% else %}
+      <a href="{{ url_for('auth.login') }}">
+        <i class="fas fa-sign-in-alt"></i>Login
+      </a>
+    {% endif %}
+  </div>
+</body>
+</html>
